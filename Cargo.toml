@@ -1,7 +1,13 @@
 [package]
 name = "sheafy"
-version = "0.1.1" # Incremented version
+version = "0.1.1"
 edition = "2021"
+description = "A command-line tool to bundle project files into a Markdown document and restore them."
+license = "MIT"
+authors = ["Pluveto <zijing.zhang@proton.me>"]
+repository = "https://github.com/pluveto/sheafy"
+keywords = ["bundle", "markdown", "gitignore", "cli"]
+categories = ["command-line-utilities", "development-tools"]
 
 [dependencies]
 clap = { version = "4.5", features = ["derive"] }

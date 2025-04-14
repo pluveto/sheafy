@@ -1,3 +1,14 @@
+//! Sheafy is a tool to bundle project files into a Markdown document and restore them.
+//!
+//! # Examples
+//! ```bash
+//! # Bundle Rust files
+//! sheafy bundle -f rs
+//!
+//! # Restore files
+//! sheafy restore bundle.md
+//! ```
+
 use anyhow::{bail, Context, Result};
 use clap::{ArgAction, Parser};
 use ignore::WalkBuilder; // Use the ignore crate's WalkBuilder
@@ -7,11 +18,9 @@ use serde::Deserialize;
 use std::{
     collections::HashSet,
     fs::{self, File},
-    io::{self, BufWriter, Read, Write},
+    io::{BufWriter, Read, Write},
     path::{Path, PathBuf},
 };
-// No longer need walkdir directly for bundle
-// use walkdir::WalkDir;
 
 const CONFIG_FILENAME: &str = "sheafy.toml";
 const DEFAULT_BUNDLE_NAME: &str = "project_bundle.md";
@@ -200,9 +209,9 @@ fn run_bundle(
 
         // Explicitly skip the config file, the output file, and the executable itself
         // These might not be covered by gitignore rules or might be desired even if ignored.
-        if Some(absolute_path.as_ref()) == config_path_abs.as_ref().map(|p| Some(p))
-            || Some(absolute_path.as_ref()) == absolute_output_path.as_ref().map(|p| Some(p))
-            || Some(absolute_path.as_ref()) == executable_path_abs.as_ref().map(|p| Some(p))
+        if Some(absolute_path.as_ref()) == config_path_abs.as_ref().map(Some)
+            || Some(absolute_path.as_ref()) == absolute_output_path.as_ref().map(Some)
+            || Some(absolute_path.as_ref()) == executable_path_abs.as_ref().map(Some)
         {
             // println!("Skipping explicitly excluded file: {}", path.display()); // Debugging
             continue;
@@ -340,13 +349,11 @@ fn run_restore(input_filename: &str) -> Result<()> {
 
         // Ensure target directory exists
         if let Some(parent_dir) = target_path.parent() {
-            if !parent_dir.exists() {
-                if !parent_dir.as_os_str().is_empty() {
-                    println!("    Creating directory: {}", parent_dir.display());
-                    fs::create_dir_all(parent_dir).with_context(|| {
-                        format!("Failed to create directory: {}", parent_dir.display())
-                    })?;
-                }
+            if !parent_dir.exists() && !parent_dir.as_os_str().is_empty() {
+                println!("    Creating directory: {}", parent_dir.display());
+                fs::create_dir_all(parent_dir).with_context(|| {
+                    format!("Failed to create directory: {}", parent_dir.display())
+                })?;
             }
         }
 
