@@ -1,0 +1,22 @@
+[sheafy]
+# Default file extensions to include (without the leading dot)
+filters = ["rs", "toml", "md"]
+
+# Default output filename for the bundle operation
+bundle_name = "project_bundle.md"
+
+# Whether to respect .gitignore files by default (true/false)
+# Defaults to true if omitted.
+use_gitignore = true
+
+prologue = """
+<!-- Start of Project Bundle -->
+# Project Bundle
+
+This is a bundle of all the source files in the project directory, including subdirectories.
+
+"""
+
+epilogue = """
+<!-- End of Project Bundle -->
+"""
