@@ -73,7 +73,7 @@ enum Commands {
     /// Restores files from a Markdown bundle file, overwriting existing files.
     Restore {
         /// The Markdown file to restore from.
-        input_file: String,
+        input_file: Option<String>,
     },
 }
 
@@ -337,14 +337,19 @@ lazy_static! {
         Regex::new(r"(?ms)^##\s*(.*?)\s*\n```[^\n]*\n(.*?)\n```\s*$").unwrap();
 }
 
-fn run_restore(input_filename: &str) -> Result<()> {
-    println!("Attempting to restore files from: {}", input_filename);
-    let input_path = Path::new(input_filename);
+fn run_restore(input_filename: Option<String>) -> Result<()> {
+    println!("Attempting to restore files");
     let config = load_config().context("Failed to load configuration")?;
+    let input_path = Path::new(
+        input_filename
+            .as_deref()
+            .or(config.sheafy.bundle_name.as_deref())
+            .unwrap_or(DEFAULT_BUNDLE_NAME),
+    );
     let current_dir = get_working_dir(&config)?;
 
     let content = fs::read_to_string(input_path)
-        .with_context(|| format!("Failed to read input file: {}", input_filename))?;
+        .with_context(|| format!("Failed to read input file: {}", input_path.display()))?;
 
     let mut restored_count = 0;
     let mut found_blocks = 0;
@@ -413,7 +418,7 @@ fn run_restore(input_filename: &str) -> Result<()> {
     if found_blocks == 0 {
         println!(
             "Warning: No valid sheafy blocks found in '{}'. No files restored.",
-            input_filename
+            input_path.display()
         );
     } else {
         println!(
@@ -442,7 +447,7 @@ fn main() -> Result<()> {
                 .context("Bundle operation failed")?;
         }
         Commands::Restore { input_file } => {
-            run_restore(&input_file).context("Restore operation failed")?;
+            run_restore(input_file).context("Restore operation failed")?;
         }
     }
 
