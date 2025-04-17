@@ -43,17 +43,24 @@ Create a `sheafy.toml` file in your project root to customize behavior:
 
 ```toml
 [sheafy]
-filters = ["rs", "toml", "md"]  # File extensions to include
-bundle_name = "docs/project_bundle.md"  # Output filename
-use_gitignore = true  # Whether to respect .gitignore rules
+filters = ["rs", "toml", "md"]  # File extensions to include, required
+
+bundle_name = "docs/project_bundle.md"  # Output filename, optional, default `project_bundle.md`
+
+working_dir = "."  # Project directory, optional
+
+use_gitignore = true  # Whether to respect .gitignore rules, optional, default true
+
 prologue = """
 # Project Bundle
 
 This is a bundle of all files in the project directory.
-"""
+""" # Prologue text, optional
+
 epilogue = """
 <!-- End of Project Bundle -->
-"""
+""" # Epilogue text, optional
+
 ```
 
 ## Command Line Options

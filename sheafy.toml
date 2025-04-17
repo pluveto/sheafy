@@ -5,6 +5,9 @@ filters = ["rs", "toml", "md"]
 # Default output filename for the bundle operation
 bundle_name = "project_bundle.md"
 
+# Default working directory for the bundle operation
+bundle_dir = "."
+
 # Whether to respect .gitignore files by default (true/false)
 # Defaults to true if omitted.
 use_gitignore = true
