@@ -27,10 +27,10 @@ const DEFAULT_BUNDLE_NAME: &str = "project_bundle.md";
 
 // --- Configuration Struct ---
 #[derive(Deserialize, Debug, Default)]
-#[serde(rename_all = "kebab-case")] // Allows kebab-case keys in TOML
 struct SheafyConfig {
     filters: Option<Vec<String>>,
     bundle_name: Option<String>,
+    working_dir: Option<String>,
     use_gitignore: Option<bool>, // Add use_gitignore field
     prologue: Option<String>,
     epilogue: Option<String>,
@@ -119,6 +119,23 @@ fn load_config() -> Result<Config> {
     }
 }
 
+fn get_working_dir(config: &Config) -> Result<PathBuf> {
+    let current_dir = std::env::current_dir().context("Failed to get current working directory")?;
+    if let Some(working_dir) = &config.sheafy.working_dir {
+        let working_dir_path = current_dir.join(&working_dir);
+        if working_dir_path.exists() {
+            Ok(working_dir_path)
+        } else {
+            bail!(
+                "Working directory does not exist: {}",
+                working_dir_path.display()
+            );
+        }
+    } else {
+        Ok(current_dir)
+    }
+}
+
 // --- Bundle Logic (Updated) ---
 fn run_bundle(
     cli_filters: Option<Vec<String>>,
@@ -127,7 +144,7 @@ fn run_bundle(
     cli_no_git: bool,
 ) -> Result<()> {
     let config = load_config().context("Failed to load configuration")?;
-    let current_dir = std::env::current_dir().context("Failed to get current working directory")?;
+    let current_dir = get_working_dir(&config)?;
 
     // --- Determine effective settings (CLI > Config > Default) ---
 
@@ -323,7 +340,8 @@ lazy_static! {
 fn run_restore(input_filename: &str) -> Result<()> {
     println!("Attempting to restore files from: {}", input_filename);
     let input_path = Path::new(input_filename);
-    let current_dir = std::env::current_dir().context("Failed to get current working directory")?;
+    let config = load_config().context("Failed to load configuration")?;
+    let current_dir = get_working_dir(&config)?;
 
     let content = fs::read_to_string(input_path)
         .with_context(|| format!("Failed to read input file: {}", input_filename))?;
