@@ -5,7 +5,7 @@ use std::{
     collections::HashSet,
     fs::File,
     io::{BufWriter, Read, Write},
-    path::{PathBuf},
+    path::PathBuf,
 };
 
 pub fn run_bundle(
@@ -20,9 +20,7 @@ pub fn run_bundle(
     // Determine effective settings (CLI > Config > Default)
     let filters_str: Vec<String> = cli_filters.or(config.sheafy.filters).unwrap_or_default();
     if filters_str.is_empty() {
-        bail!(
-            "No file filters provided via flags or in config. Cannot proceed."
-        );
+        bail!("No file filters provided via flags or in config. Cannot proceed.");
     }
     let filters: HashSet<String> = filters_str
         .into_iter()

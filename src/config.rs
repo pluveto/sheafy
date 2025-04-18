@@ -81,7 +81,8 @@ impl Config {
     }
 
     pub fn get_working_dir(&self) -> Result<PathBuf> {
-        let current_dir = std::env::current_dir().context("Failed to get current working directory")?;
+        let current_dir =
+            std::env::current_dir().context("Failed to get current working directory")?;
         if let Some(working_dir) = &self.sheafy.working_dir {
             let working_dir_path = current_dir.join(working_dir);
             if working_dir_path.exists() {
