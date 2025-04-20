@@ -13,9 +13,10 @@ pub enum Commands {
     Init,
     /// Bundles project files into a single Markdown file
     Bundle {
-        /// Comma-separated list of file extensions to include (e.g., rs,py,txt). Overrides config.
-        #[arg(short, long, value_delimiter = ',')]
-        filters: Option<Vec<String>>,
+        // REMOVED: filters argument
+        // /// Comma-separated list of file extensions to include (e.g., rs,py,txt). Overrides config.
+        // #[arg(short, long, value_delimiter = ',')]
+        // filters: Option<Vec<String>>,
 
         /// Output Markdown filename. Overrides config.
         #[arg(short, long)]

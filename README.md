@@ -1,3 +1,4 @@
+
 # Sheafy - Project File Bundler
 
 ## Overview
@@ -6,35 +7,44 @@ Sheafy is a command-line tool that bundles project files into a single Markdown 
 
 ## Features
 
-- **Smart Bundling**: Collects files from your project directory into a well-formatted Markdown file
-- **Flexible Filtering**: Supports file extension filters via CLI or config file
-- **Gitignore Integration**: Respects `.gitignore` rules by default (configurable)
-- **Restore Capability**: Can recreate the original file structure from a bundle
-- **Configurable**: Supports prologue/epilogue text and output filename configuration
+- **Smart Bundling**: Collects files from your project directory into a well-formatted Markdown file.
+- **Flexible Ignoring**: Uses `.gitignore` rules by default and supports additional custom ignore patterns via `sheafy.toml`.
+- **Restore Capability**: Can recreate the original file structure from a bundle.
+- **Configurable**: Supports prologue/epilogue text, output filename, working directory, and ignore behavior configuration.
 
 ## Installation
 
 ### From Source
 
-1. Ensure you have Rust installed (via [rustup](https://rustup.rs/))
-2. Clone this repository
-3. Build and install:
-   ```bash
-   cargo install --path .
-   ```
+1.  Ensure you have Rust installed (via [rustup](https://rustup.rs/))
+2.  Clone this repository
+3.  Build and install:
+    ```bash
+    cargo install --path .
+    ```
 
 ## Usage
 
 ### Basic Commands
 
-**Create a bundle:**
+**Create a bundle (using defaults and `.gitignore`):**
 ```bash
-sheafy bundle -f rs,toml,md -o project_bundle.md
+sheafy bundle
+```
+
+**Create a bundle with a specific output name:**
+```bash
+sheafy bundle -o my_project_bundle.md
 ```
 
 **Restore files from a bundle:**
 ```bash
 sheafy restore project_bundle.md
+```
+
+**Initialize a default `sheafy.toml` config file:**
+```bash
+sheafy init
 ```
 
 ### Configuration
@@ -43,27 +53,50 @@ Create a `sheafy.toml` file in your project root to customize behavior:
 
 ```toml
 [sheafy]
-filters = ["rs", "toml", "md"]  # File extensions to include, required
+# Output filename for bundle command, optional, default `project_bundle.md`
+# bundle_name = "docs/project_bundle.md"
 
-bundle_name = "docs/project_bundle.md"  # Output filename, optional, default `project_bundle.md`
+# Optional working directory (relative to where sheafy is run), optional, default "."
+# working_dir = "src"
 
-working_dir = "."  # Project directory, optional
+# Whether to respect .gitignore rules, optional, default true
+# use_gitignore = true
 
-use_gitignore = true  # Whether to respect .gitignore rules, optional, default true
+# Optional: Add custom ignore patterns (multi-line string, gitignore syntax)
+# These are applied *in addition* to .gitignore rules (if use_gitignore is true).
+# Patterns are relative to the working directory.
+# ignore_patterns = """
+# # Ignore all log files
+# *.log
+#
+# # Ignore specific directories
+# target/
+# node_modules/
+#
+# # But include specific file types within an ignored directory (if needed)
+# # !target/*.rs
+# """
 
-prologue = """
-# Project Bundle
+# Optional prologue text to include at start of bundle
+# prologue = """
+# # Project Bundle
+#
+# This is a bundle of all files in the project directory.
+# """
 
-This is a bundle of all files in the project directory.
-""" # Prologue text, optional
-
-epilogue = """
-<!-- End of Project Bundle -->
-""" # Epilogue text, optional
-
+# Optional epilogue text to include at end of bundle
+# epilogue = """
+# # """
 ```
 
 ## Command Line Options
+
+### Init Command
+```
+USAGE:
+    sheafy init
+```
+Creates a default `sheafy.toml` file.
 
 ### Bundle Command
 
@@ -72,39 +105,45 @@ USAGE:
     sheafy bundle [OPTIONS]
 
 OPTIONS:
-    -f, --filters <FILTERS>...    Comma-separated list of file extensions to include
-    -o, --output <OUTPUT>         Output Markdown filename
-        --use-gitignore           Force use of .gitignore rules
-        --no-gitignore            Force disabling .gitignore rules
+    -o, --output <OUTPUT>        Output Markdown filename (overrides config)
+        --use-gitignore          Force use of .gitignore rules (overrides config if set to false)
+        --no-gitignore           Force disabling .gitignore rules (overrides config and --use-gitignore)
 ```
+*Note: File inclusion/exclusion is now primarily controlled by `.gitignore` (if enabled) and the `ignore_patterns` setting in `sheafy.toml`.*
 
 ### Restore Command
 
 ```
 USAGE:
-    sheafy restore <INPUT_FILE>
+    sheafy restore [INPUT_FILE]
 
 ARGS:
-    <INPUT_FILE>    The Markdown file to restore from
+    <INPUT_FILE>    The Markdown file to restore from (optional, defaults to `bundle_name` in config or `project_bundle.md`)
 ```
 
 ## Examples
 
-**Bundle only Rust and Markdown files:**
+**Bundle using default settings:**
 ```bash
-sheafy bundle -f rs,md
+# Creates project_bundle.md respecting .gitignore and sheafy.toml ignore_patterns
+sheafy bundle
 ```
 
-**Bundle with custom output name:**
+**Bundle ignoring `.gitignore` rules but using `sheafy.toml` patterns:**
 ```bash
-sheafy bundle -f py -o python_files.md
+sheafy bundle --no-gitignore
+```
+
+**Bundle to a specific file:**
+```bash
+sheafy bundle -o my_code.md
 ```
 
 **Restore files overwriting existing ones:**
 ```bash
-sheafy restore backup_2023-12-01.md
+sheafy restore backup_bundle.md
 ```
 
 ## License
 
-See [LICENSE](LICENSE) for more information.
+See ![LICENSE](LICENSE) for more information.
