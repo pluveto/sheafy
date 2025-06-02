@@ -1,6 +1,6 @@
 use crate::config::{Config, DEFAULT_BUNDLE_NAME};
 use anyhow::{bail, Context, Result};
-use ignore::{gitignore::GitignoreBuilder, overrides::OverrideBuilder, WalkBuilder}; // Import OverrideBuilder
+use ignore::{WalkBuilder}; // Import OverrideBuilder
 use std::{
     fs::{self, File},
     io::{BufWriter, Read, Write},

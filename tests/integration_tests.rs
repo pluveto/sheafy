@@ -1,7 +1,6 @@
 // tests/integration_tests.rs
 
 use std::fs;
-use std::io::Write;
 use std::path::Path;
 use std::process::Command;
 use tempfile::tempdir;
@@ -358,8 +357,8 @@ value = 123
 
     assert!(!src_main_path.exists());
     assert!(!config_settings_path.exists());
-    assert!(dir.path().join("src").exists() == false); // Directory shouldn't exist yet
-    assert!(dir.path().join("config").exists() == false); // Directory shouldn't exist yet
+    assert!(!dir.path().join("src").exists()); // Directory shouldn't exist yet
+    assert!(!dir.path().join("config").exists()); // Directory shouldn't exist yet
 
     let mut cmd = get_sheafy_cmd();
     cmd.arg("restore")
@@ -434,7 +433,7 @@ Config Default
 "#;
     let default_bundle_name = "default_from_cfg.md";
     let bundle_path = dir.path().join(default_bundle_name);
-    fs::write(&bundle_path, bundle_content).unwrap();
+    fs::write(bundle_path, bundle_content).unwrap();
 
     let config_content = format!("[sheafy]\nbundle_name = \"{}\"", default_bundle_name);
     fs::write(dir.path().join("sheafy.toml"), config_content).unwrap();
@@ -462,7 +461,7 @@ fn test_bundle_non_utf8_file_handling() {
     // Create a file with invalid UTF-8 sequence (0x80 is continuation byte without start)
     fs::write(
         dir.path().join("invalid_utf8.bin"),
-        &[0x48, 0x65, 0x6c, 0x6c, 0x80, 0x6f],
+        [0x48, 0x65, 0x6c, 0x6c, 0x80, 0x6f],
     )
     .unwrap();
     fs::write(dir.path().join("valid.txt"), "Valid text").unwrap();

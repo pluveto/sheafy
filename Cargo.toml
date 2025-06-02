@@ -1,6 +1,6 @@
 [package]
 name = "sheafy"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 description = "A command-line tool to bundle project files into a Markdown document and restore them."
 license = "MIT"
